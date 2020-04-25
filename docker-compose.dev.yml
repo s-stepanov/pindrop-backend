@@ -1,0 +1,32 @@
+version: "3.7"
+
+volumes:
+  db-data:
+
+services:
+  pindrop-backend:
+    image: node:12-alpine
+    working_dir: /home/node/app
+    command: "npm run start:dev"
+    volumes:
+      - .:/home/node/app
+    ports:
+      - 3000:3000
+
+  db:
+    image: postgres:11
+    restart: always
+    environment:
+      POSTGRES_DB: pindrop
+      POSTGRES_PASSWORD: pindropdev
+      POSTGRES_USER: pindrop
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
