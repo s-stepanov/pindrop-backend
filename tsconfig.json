@@ -10,8 +10,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
-    "rootDir": "./",
-    "plugins": ["@nestjs/swagger/plugin"]
+    "rootDir": "./"
   },
   "exclude": ["node_modules", "dist"]
 }
