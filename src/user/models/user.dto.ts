@@ -1,4 +1,36 @@
 import { IsEmail, IsNotEmpty, Length, Equals } from 'class-validator';
+import {
+  registerDecorator,
+  ValidationArguments,
+  ValidationOptions,
+} from 'class-validator';
+
+export function IsEqualTo(
+  property: string,
+  validationOptions?: ValidationOptions,
+) {
+  return (object: any, propertyName: string) => {
+    registerDecorator({
+      name: 'isEqualTo',
+      target: object.constructor,
+      propertyName,
+      constraints: [property],
+      options: validationOptions,
+      validator: {
+        validate(value: any, args: ValidationArguments) {
+          const [relatedPropertyName] = args.constraints;
+          const relatedValue = (args.object as any)[relatedPropertyName];
+          return value === relatedValue;
+        },
+
+        defaultMessage(args: ValidationArguments) {
+          const [relatedPropertyName] = args.constraints;
+          return `${propertyName} must match ${relatedPropertyName} exactly`;
+        },
+      },
+    });
+  };
+}
 
 export class UserDto {
   id: string;
@@ -15,6 +47,6 @@ export class UserCreationDto {
   password: string;
 
   @IsNotEmpty()
-  @Equals(this.password)
+  @IsEqualTo('password')
   passwordConfirmation: string;
 }
