@@ -4,6 +4,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
+import { User } from './user/entities/user.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { UserModule } from './user/user.module';
           port: configService.get('DB_PORT'),
           type: 'postgres',
           synchronize: false,
-          entities: [],
+          entities: [User],
         };
       },
       inject: [ConfigService],
