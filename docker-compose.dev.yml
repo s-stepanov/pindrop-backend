@@ -2,6 +2,7 @@ version: "3.7"
 
 volumes:
   db-data:
+  pgadmin:
 
 services:
   pindrop-backend:
@@ -25,8 +26,15 @@ services:
     ports:
       - 5432:5432
 
-  adminer:
-    image: adminer
-    restart: always
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+    logging:
+      driver: none 
+    volumes:
+       - pgadmin:/root/.pgadmin
     ports:
-      - 8080:8080
+      - "${PGADMIN_PORT:-5050}:80"
+    restart: unless-stopped
