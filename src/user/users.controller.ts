@@ -7,22 +7,27 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { IdParameter } from 'src/shared/request-params.model';
 import { UserCreationDto, UserDto } from './models/user.dto';
 import { UsersService } from './users.service';
-import { ApiParam, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiParam, ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('users')
+@ApiBearerAuth()
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   public getAllUsers(): Promise<UserDto[]> {
     return this.usersService.getAllUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiParam({
     name: 'id',
@@ -48,6 +53,7 @@ export class UsersController {
     return this.usersService.registerUser(user);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   public deleteUser(@Param() param: IdParameter): Promise<UserDto> {
     return this.usersService.deleteUser(param.id);

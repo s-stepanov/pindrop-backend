@@ -1,5 +1,5 @@
 setup-dev-env:
-	npm install --silent
+	npm install --silent && docker-compose -f docker-compose.dev.yml build
 
 run-dev:
 	docker-compose -f docker-compose.dev.yml up

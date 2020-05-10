@@ -10,6 +10,7 @@ async function bootstrap() {
     .setTitle('Pindrop API')
     .setDescription('Pindrop application REST API')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('api-spec', app, document);
