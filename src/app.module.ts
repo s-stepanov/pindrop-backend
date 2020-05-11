@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
+import { UserRole } from './user/entities/user-role.entity';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { AuthModule } from './auth/auth.module';
           port: configService.get('DB_PORT'),
           type: 'postgres',
           synchronize: false,
-          entities: [User],
+          entities: [User, UserRole],
         };
       },
       inject: [ConfigService],

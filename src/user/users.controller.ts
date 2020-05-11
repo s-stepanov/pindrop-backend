@@ -8,12 +8,14 @@ import {
   Param,
   Post,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { IdParameter } from 'src/shared/request-params.model';
 import { UserCreationDto, UserDto } from './models/user.dto';
 import { UsersService } from './users.service';
 import { ApiParam, ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UserExistsError } from './errors/user-exists.error';
 
 @ApiTags('users')
 @ApiBearerAuth()
@@ -49,8 +51,15 @@ export class UsersController {
 
   @Post()
   @ApiResponse({ status: 400, description: 'Bad request' })
-  public registerUser(@Body() user: UserCreationDto): Promise<UserDto> {
-    return this.usersService.registerUser(user);
+  public async registerUser(@Body() user: UserCreationDto): Promise<UserDto> {
+    try {
+      const registered = await this.usersService.registerUser(user);
+      return registered;
+    } catch (error) {
+      if (error instanceof UserExistsError) {
+        throw new BadRequestException(error.message);
+      }
+    }
   }
 
   @UseGuards(JwtAuthGuard)
