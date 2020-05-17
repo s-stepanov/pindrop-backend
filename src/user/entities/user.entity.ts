@@ -23,8 +23,10 @@ export class User {
   @Column()
   nickname: string;
 
-  @Column()
-  accountActive: boolean = false;
+  @Column({
+    default: false,
+  })
+  accountActive: boolean;
 
   @ManyToMany(_ => UserRole)
   @JoinTable()

@@ -26,11 +26,13 @@ export class UsersService {
   ) {}
 
   async getAllUsers(): Promise<UserDto[]> {
-    return this.usersRepository.find({ select: ['email', 'id'] });
+    return this.usersRepository.find({ select: ['email', 'id', 'nickname'] });
   }
 
   async getUserById(userId: number): Promise<UserDto> {
-    return this.usersRepository.findOne(userId, { select: ['email', 'id'] });
+    return this.usersRepository.findOne(userId, {
+      select: ['email', 'id', 'nickname'],
+    });
   }
 
   async getUserByEmail(email: string): Promise<User> {
