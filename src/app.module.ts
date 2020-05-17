@@ -5,6 +5,12 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { User } from './user/entities/user.entity';
+import { AuthModule } from './auth/auth.module';
+import { UserRole } from './user/entities/user-role.entity';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { join } from 'path';
+import { UserPendingActivation } from './user/entities/user-pending-activation.entity';
 
 @Module({
   imports: [
@@ -20,12 +26,42 @@ import { User } from './user/entities/user.entity';
           port: configService.get('DB_PORT'),
           type: 'postgres',
           synchronize: false,
-          entities: [User],
+          entities: [User, UserRole, UserPendingActivation],
         };
       },
       inject: [ConfigService],
     }),
     UserModule,
+    AuthModule,
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        console.log(
+          configService.get('SENDGRID_USERNAME'),
+          configService.get('SENDGRID_PASSWORD'),
+        );
+        return {
+          transport: {
+            service: 'gmail',
+            auth: {
+              user: configService.get('GMAIL_USERNAME'),
+              pass: configService.get('GMAIL_PASSWORD'),
+            },
+          },
+          defaults: {
+            from: '"Pindrop Application" <pindrop@app.com>',
+          },
+          template: {
+            dir: join(__dirname, '../..', '/templates'),
+            adapter: new HandlebarsAdapter(),
+            options: {
+              strict: true,
+            },
+          },
+        };
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

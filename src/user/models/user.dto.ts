@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, Length, Equals } from 'class-validator';
+import { IsEmail, IsNotEmpty, Length } from 'class-validator';
 import {
   registerDecorator,
   ValidationArguments,
@@ -35,6 +35,8 @@ export function IsEqualTo(
 export class UserDto {
   id: string;
   email: string;
+  nickname: string;
+  accountActive: boolean;
 }
 
 export class UserCreationDto {
@@ -45,6 +47,10 @@ export class UserCreationDto {
   @IsNotEmpty()
   @Length(6)
   password: string;
+
+  @IsNotEmpty()
+  @Length(4)
+  nickname: string;
 
   @IsNotEmpty()
   @IsEqualTo('password')
