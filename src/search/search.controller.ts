@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Param } from '@nestjs/common';
 import { SearchService } from './search.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
@@ -24,5 +24,15 @@ export class SearchController {
     @Query('page') page?: number,
   ) {
     return this.searchService.searchAlbums(term, page, limit);
+  }
+
+  @Get('artists/:mbid')
+  public async getArtistByMbid(@Param('mbid') mbid: string) {
+    return this.searchService.searchArtistInfo(mbid);
+  }
+
+  @Get('albums/:mbid')
+  public async getAlbumByMbid(@Param('mbid') mbid: string) {
+    return this.searchService.searchAlbumInfo(mbid);
   }
 }

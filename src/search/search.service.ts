@@ -1,10 +1,10 @@
 import { Injectable, HttpService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { SearchResponse } from './models/search-response';
 import { Artist, ArtistSearch } from './models/artist';
-import { Album } from './models/album';
+import { Album, AlbumSearch } from './models/album';
 
 @Injectable()
 export class SearchService {
@@ -22,7 +22,7 @@ export class SearchService {
     term: string,
     page: number,
     limit: number,
-  ): Observable<SearchResponse<Artist>> {
+  ): Observable<SearchResponse<ArtistSearch>> {
     const searchURL = `${this.apiURLBase}?method=artist.search&artist=${term}&api_key=${this.apiKey}&format=json&page=${page}&limit=${limit}`;
     return this.httpClient
       .get(searchURL)
@@ -33,14 +33,28 @@ export class SearchService {
     term: string,
     page: number,
     limit: number,
-  ): Observable<SearchResponse<Album>> {
+  ): Observable<SearchResponse<AlbumSearch>> {
     const searchURL = `${this.apiURLBase}?method=album.search&album=${term}&api_key=${this.apiKey}&format=json&page=${page}&limit=${limit}`;
     return this.httpClient
       .get(searchURL)
       .pipe(map(data => this.transformAlbums(data?.data.results)));
   }
 
-  public transformArtists(apiResponse: any): SearchResponse<Artist> {
+  public searchArtistInfo(mbid: string): Observable<Artist> {
+    const artistURL = `${this.apiURLBase}?method=artist.getinfo&mbid=${mbid}&api_key=${this.apiKey}&format=json`;
+    return this.httpClient
+      .get(artistURL)
+      .pipe(map(data => this.transformArtist(data?.data.artist)));
+  }
+
+  public searchAlbumInfo(mbid: string): Observable<any> {
+    const albumURL = `${this.apiURLBase}?method=album.getinfo&mbid=${mbid}&api_key=${this.apiKey}&format=json`;
+    return this.httpClient
+      .get(albumURL)
+      .pipe(map(data => this.transformAlbum(data?.data.album)));
+  }
+
+  public transformArtists(apiResponse: any): SearchResponse<ArtistSearch> {
     if (!apiResponse) {
       throw Error('Unable to get response from LastFM');
     }
@@ -63,11 +77,11 @@ export class SearchService {
     };
   }
 
-  public transformAlbums(apiResponse: any): SearchResponse<Album> {
+  public transformAlbums(apiResponse: any): SearchResponse<AlbumSearch> {
     if (!apiResponse) {
       throw Error('Unable to get response from LastFM');
     }
-    const artists: ArtistSearch[] = apiResponse?.albummatches.album.map(
+    const artists: AlbumSearch[] = apiResponse?.albummatches.album.map(
       album => ({
         name: album.name,
         mbid: album.mbid,
@@ -75,7 +89,7 @@ export class SearchService {
           url: img['#text'],
           size: img.size,
         })),
-        artist: album.listeners,
+        artist: album.artist,
       }),
     );
     return {
@@ -83,6 +97,40 @@ export class SearchService {
       itemsPerPage: apiResponse['opensearch:itemsPerPage'],
       startIndex: apiResponse['opensearch:startIndex'],
       matches: artists,
+    };
+  }
+
+  public transformArtist(apiResponse: any): Artist {
+    const { name, mbid, image, bio, listeners } = apiResponse;
+
+    return {
+      name,
+      mbid,
+      image,
+      bio,
+      listeners,
+    };
+  }
+
+  public transformAlbum(apiResponse: any): Album {
+    const {
+      name,
+      artist,
+      mbid,
+      releaseDate,
+      playCount,
+      topTags,
+      tracks,
+    } = apiResponse;
+
+    return {
+      name,
+      artist,
+      mbid,
+      releaseDate,
+      playCount,
+      topTags,
+      tracks,
     };
   }
 }
