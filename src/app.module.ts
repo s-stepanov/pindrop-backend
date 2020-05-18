@@ -11,6 +11,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
 import { UserPendingActivation } from './user/entities/user-pending-activation.entity';
+import { SearchModule } from './search/search.module';
 
 @Module({
   imports: [
@@ -37,10 +38,6 @@ import { UserPendingActivation } from './user/entities/user-pending-activation.e
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log(
-          configService.get('SENDGRID_USERNAME'),
-          configService.get('SENDGRID_PASSWORD'),
-        );
         return {
           transport: {
             service: 'gmail',
@@ -62,6 +59,7 @@ import { UserPendingActivation } from './user/entities/user-pending-activation.e
         };
       },
     }),
+    SearchModule,
   ],
   controllers: [AppController],
   providers: [AppService],
