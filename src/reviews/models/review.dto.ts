@@ -18,5 +18,6 @@ export class ReviewDto {
   releaseMbid: string;
   author: UserDto;
   releaseScore: number;
+  rating: number;
   id: number;
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { Review } from './review.entity';
+import { Review } from './entities/review.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateReviewDto, ReviewDto } from './models/review.dto';
 import { User } from 'src/user/entities/user.entity';

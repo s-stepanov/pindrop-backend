@@ -22,6 +22,11 @@ export class Review {
   @Column()
   releaseMbid: string;
 
+  @Column({
+    default: 0,
+  })
+  rating: number;
+
   @ManyToOne(_ => User)
   author: User;
 

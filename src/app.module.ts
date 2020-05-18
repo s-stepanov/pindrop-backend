@@ -13,7 +13,8 @@ import { join } from 'path';
 import { UserPendingActivation } from './user/entities/user-pending-activation.entity';
 import { SearchModule } from './search/search.module';
 import { ReviewsModule } from './reviews/reviews.module';
-import { Review } from './reviews/review.entity';
+import { Review } from './reviews/entities/review.entity';
+import { ReviewVote } from './reviews/entities/review-vote.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { Review } from './reviews/review.entity';
           port: configService.get('DB_PORT'),
           type: 'postgres',
           synchronize: false,
-          entities: [User, UserRole, UserPendingActivation, Review],
+          entities: [User, UserRole, UserPendingActivation, Review, ReviewVote],
+          logging: true,
         };
       },
       inject: [ConfigService],

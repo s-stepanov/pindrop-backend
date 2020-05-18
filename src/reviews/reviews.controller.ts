@@ -7,17 +7,24 @@ import {
   Param,
   Body,
   BadRequestException,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { ReviewsService } from './reviews.service';
 import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateReviewDto, ReviewDto } from './models/review.dto';
 import { ApiQuery } from '@nestjs/swagger';
+import { ReviewActions } from './enums/review-actions.enum';
+import { VotingService } from './voting.service';
+import { LoggedInUser } from 'src/shared/decorators/logged-in-user.decorator';
+import { VoteExistsError } from './errors/vote-exists.error';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('reviews')
 @ApiBearerAuth()
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(private readonly reviewsService: ReviewsService, private readonly votingService: VotingService) {}
 
   /**
    * Returns pageable most recent reviews
@@ -52,9 +59,7 @@ export class ReviewsController {
    * @param reviewDto - request body
    */
   @Post()
-  public async createReview(
-    @Body() reviewDto: CreateReviewDto,
-  ): Promise<ReviewDto> {
+  public async createReview(@Body() reviewDto: CreateReviewDto): Promise<ReviewDto> {
     try {
       const created = await this.reviewsService.createReview(reviewDto);
       return created;
@@ -70,5 +75,27 @@ export class ReviewsController {
   @Delete(':id')
   public async deleteReview(@Param('id') id: number): Promise<ReviewDto> {
     return this.reviewsService.deleteReview(id);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch(':id')
+  public async voteForReview(
+    @Param('id') id: number,
+    @Query('action') action: ReviewActions,
+    @LoggedInUser() user,
+  ): Promise<ReviewDto> {
+    try {
+      if (!Object.values(ReviewActions).includes(action)) {
+        throw new BadRequestException('unknown action');
+      }
+
+      const votedReview = await this.votingService.voteForReview(id, user.id, action);
+      return votedReview;
+    } catch (e) {
+      if (e instanceof VoteExistsError) {
+        throw new BadRequestException(e);
+      }
+      throw e;
+    }
   }
 }
