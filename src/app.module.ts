@@ -12,6 +12,9 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { UserPendingActivation } from './user/entities/user-pending-activation.entity';
 import { SearchModule } from './search/search.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { Review } from './reviews/entities/review.entity';
+import { ReviewVote } from './reviews/entities/review-vote.entity';
 
 @Module({
   imports: [
@@ -27,7 +30,8 @@ import { SearchModule } from './search/search.module';
           port: configService.get('DB_PORT'),
           type: 'postgres',
           synchronize: false,
-          entities: [User, UserRole, UserPendingActivation],
+          entities: [User, UserRole, UserPendingActivation, Review, ReviewVote],
+          logging: true,
         };
       },
       inject: [ConfigService],
@@ -60,6 +64,7 @@ import { SearchModule } from './search/search.module';
       },
     }),
     SearchModule,
+    ReviewsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
