@@ -32,7 +32,7 @@ export class User {
   @JoinTable()
   userRole: UserRole[];
 
-  @Column()
+  @Column({ select: false })
   @Exclude()
   password: string;
 }
