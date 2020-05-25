@@ -38,7 +38,8 @@ export class UsersService {
   async getUserByEmail(email: string): Promise<User> {
     return this.usersRepository.findOne({
       where: { email },
-      select: ['email', 'id', 'nickname', 'password'],
+      select: ['email', 'id', 'nickname', 'password', 'accountActive'],
+      relations: ['userRole'],
     });
   }
 
@@ -64,7 +65,7 @@ export class UsersService {
 
     const saved = await this.usersRepository.save(newUser);
 
-    const activationLinkHash = await bcrypt.hash(user.nickname + Date.now(), 8);
+    const activationLinkHash = await (await bcrypt.hash(user.nickname + Date.now(), 8)).replace('/', '');
     const activationLinkToSave = this.pendingActivationRepository.create({
       activationHash: activationLinkHash,
     });
@@ -75,9 +76,7 @@ export class UsersService {
 
     await this.sendAccountConfirmationEmail(
       saved,
-      `${this.configService.get(
-        'ACCOUNT_ACTIVATION_URL',
-      )}/${activationLinkHash}`,
+      `${this.configService.get('ACCOUNT_ACTIVATION_URL')}/${activationLinkHash}`,
     );
 
     return {
