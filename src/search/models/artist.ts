@@ -1,4 +1,5 @@
 import { Image } from 'src/shared/models/image';
+import { AlbumSearch } from './album';
 
 export interface Artist {}
 
@@ -11,4 +12,5 @@ export interface ArtistSearch {
     summary: string;
     content: string;
   };
+  albums: AlbumSearch[];
 }
