@@ -1,12 +1,6 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
+import { ReleaseMetadata } from './review-release-metadata.entity';
 
 @Entity('reviews')
 export class Review {
@@ -19,9 +13,6 @@ export class Review {
   @Column()
   releaseScore: number;
 
-  @Column()
-  releaseMbid: string;
-
   @Column({
     default: 0,
   })
@@ -29,6 +20,9 @@ export class Review {
 
   @ManyToOne(_ => User)
   author: User;
+
+  @ManyToOne(_ => ReleaseMetadata)
+  releaseMetadata: ReleaseMetadata;
 
   @CreateDateColumn()
   createdDate: Date;

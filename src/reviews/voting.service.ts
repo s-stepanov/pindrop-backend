@@ -6,6 +6,12 @@ import { ReviewVote } from './entities/review-vote.entity';
 import { User } from 'src/user/entities/user.entity';
 import { ReviewActions } from './enums/review-actions.enum';
 import { VoteExistsError } from './errors/vote-exists.error';
+import { ReviewDto } from './models/review.dto';
+
+export const voteActionsMap = {
+  upvote: 1,
+  downvote: -1,
+};
 
 @Injectable()
 export class VotingService {
@@ -15,11 +21,12 @@ export class VotingService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  public async voteForReview(reviewId: number, userId: number, action: ReviewActions): Promise<Review> {
+  public async voteForReview(reviewId: number, userId: number, action: ReviewActions): Promise<ReviewDto> {
     let vote: ReviewVote = await this.getVote(userId, reviewId);
-    if (vote?.action === action) {
+    if (Math.abs(vote?.action + voteActionsMap[action]) > 1) {
       throw new VoteExistsError(action);
     }
+
     if (!vote) {
       vote = this.votesRepository.create();
     }
@@ -29,7 +36,8 @@ export class VotingService {
 
     vote.review = reviewToVote;
     vote.user = votingUser;
-    vote.action = action;
+
+    vote.action = vote.action !== undefined ? vote.action + voteActionsMap[action] : 0;
 
     action === ReviewActions.UPVOTE ? reviewToVote.rating++ : reviewToVote.rating--;
 
@@ -38,7 +46,11 @@ export class VotingService {
       await em.save(vote);
     });
 
-    return Promise.resolve(reviewToVote);
+    return Promise.resolve({
+      ...reviewToVote,
+      canDownvote: vote.action !== -1,
+      canUpvote: vote.action !== 1,
+    });
   }
 
   public async getVote(userId: number, reviewId: number): Promise<ReviewVote> {

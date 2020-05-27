@@ -1,5 +1,6 @@
 import { UserDto } from 'src/user/models/user.dto';
 import { IsNotEmpty } from 'class-validator';
+import { ReleaseMetadata } from '../entities/review-release-metadata.entity';
 
 export class CreateReviewDto {
   content: string;
@@ -15,9 +16,11 @@ export class CreateReviewDto {
 
 export class ReviewDto {
   content: string;
-  releaseMbid: string;
+  releaseMetadata: ReleaseMetadata;
   author: UserDto;
   releaseScore: number;
   rating: number;
   id: number;
+  canUpvote?: boolean;
+  canDownvote?: boolean;
 }

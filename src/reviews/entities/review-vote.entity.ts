@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Unique,
-  ManyToOne,
-  Column,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Unique, ManyToOne, Column } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { Review } from './review.entity';
 
@@ -14,8 +8,10 @@ export class ReviewVote {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  action: string;
+  @Column({
+    default: 0,
+  })
+  action: number;
 
   @ManyToOne(_ => User)
   user: User;

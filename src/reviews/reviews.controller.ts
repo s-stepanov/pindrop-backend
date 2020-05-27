@@ -22,6 +22,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('reviews')
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService, private readonly votingService: VotingService) {}
@@ -40,13 +41,20 @@ export class ReviewsController {
     required: false,
     type: Number,
   })
+  @ApiQuery({
+    name: 'sort',
+    required: false,
+    type: String,
+  })
   public async getReviews(
     @Query('page') page: number = 0,
     @Query('limit') limit: number = 10,
     @Query('mbid') mbid: string,
     @Query('authorId') authorId: number,
+    @Query('sort') sort: string,
+    @LoggedInUser() user,
   ): Promise<ReviewDto[]> {
-    return this.reviewsService.getReviews(page, limit, mbid, authorId);
+    return this.reviewsService.getReviews(page, limit, mbid, authorId, sort, user.id);
   }
 
   @Get(':id')
@@ -77,7 +85,6 @@ export class ReviewsController {
     return this.reviewsService.deleteReview(id);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   public async voteForReview(
     @Param('id') id: number,

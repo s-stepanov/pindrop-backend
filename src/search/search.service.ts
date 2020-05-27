@@ -40,7 +40,7 @@ export class SearchService {
     );
   }
 
-  public searchAlbumInfo(mbid: string): Observable<any> {
+  public searchAlbumInfo(mbid: string): Observable<Album> {
     const albumURL = `${this.apiURLBase}?method=album.getinfo&mbid=${mbid}&api_key=${this.apiKey}&format=json`;
     return this.httpClient.get(albumURL).pipe(map(data => this.transformAlbum(data?.data.album)));
   }

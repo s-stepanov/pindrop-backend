@@ -7,9 +7,11 @@ import { UserModule } from 'src/user/user.module';
 import { User } from 'src/user/entities/user.entity';
 import { VotingService } from './voting.service';
 import { ReviewVote } from './entities/review-vote.entity';
+import { ReleaseMetadata } from './entities/review-release-metadata.entity';
+import { SearchModule } from 'src/search/search.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review, ReviewVote, User]), UserModule],
+  imports: [TypeOrmModule.forFeature([Review, ReviewVote, User, ReleaseMetadata]), UserModule, SearchModule],
   providers: [ReviewsService, VotingService],
   controllers: [ReviewsController],
 })

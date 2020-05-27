@@ -15,6 +15,7 @@ import { SearchModule } from './search/search.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { Review } from './reviews/entities/review.entity';
 import { ReviewVote } from './reviews/entities/review-vote.entity';
+import { ReleaseMetadata } from './reviews/entities/review-release-metadata.entity';
 
 @Module({
   imports: [
@@ -30,8 +31,8 @@ import { ReviewVote } from './reviews/entities/review-vote.entity';
           port: configService.get('DB_PORT'),
           type: 'postgres',
           synchronize: false,
-          entities: [User, UserRole, UserPendingActivation, Review, ReviewVote],
-          logging: true,
+          entities: [User, UserRole, UserPendingActivation, Review, ReviewVote, ReleaseMetadata],
+          logging: false,
         };
       },
       inject: [ConfigService],
