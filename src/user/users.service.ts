@@ -26,7 +26,7 @@ export class UsersService {
   ) {}
 
   async getAllUsers(): Promise<UserDto[]> {
-    return this.usersRepository.find({ select: ['email', 'id', 'nickname'] });
+    return this.usersRepository.find({ select: ['email', 'id', 'nickname', 'accountActive'] });
   }
 
   async getUserById(userId: number): Promise<UserDto> {
